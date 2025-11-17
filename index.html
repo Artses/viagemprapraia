@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Contagem Regressiva - Praia (29 de dezembro)</title>
+  <style>
+    /* Reset mínimo */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html,body { height: 100%; font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; background: linear-gradient(180deg,#071026 0%, #0f2540 50%, #0b3b2f 100%); color: #f7fafc; }
+    .wrap {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px;
+      gap: 32px;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .card {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border-radius: 16px;
+      box-shadow: 0 10px 30px rgba(2,6,23,0.6), inset 0 1px 0 rgba(255,255,255,0.02);
+      padding: 28px;
+      max-width: 760px;
+      width: 100%;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    h1 { font-size: 1.6rem; margin-bottom: 6px; letter-spacing: -0.02em; }
+    p.lead { opacity: 0.85; margin-bottom: 18px; }
+
+    .countdown {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0 24px;
+    }
+    .unit {
+      background: rgba(255,255,255,0.02);
+      padding: 16px;
+      border-radius: 10px;
+      min-height: 96px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      border: 1px solid rgba(255,255,255,0.02);
+    }
+    .value { font-size: 1.9rem; font-weight: 700; letter-spacing: -0.02em; }
+    .label { font-size: 0.85rem; margin-top:6px; opacity:0.8; text-transform:uppercase; }
+
+    .meta {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+    }
+
+    .progress-wrap { flex:1; min-width:220px; margin-top:8px; }
+    progress {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 12px;
+      border-radius: 12px;
+      overflow:hidden;
+    }
+    progress::-webkit-progress-bar { background: rgba(255,255,255,0.03); }
+    progress::-webkit-progress-value { background: linear-gradient(90deg,#FFD166,#EF476F); }
+    .target { font-size: 0.9rem; opacity:0.9; text-align:right; min-width:200px; }
+
+    .controls {
+      margin-top: 16px;
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      flex-wrap:wrap;
+    }
+    .btn {
+      background: rgba(255,255,255,0.03);
+      color: inherit;
+      border: 1px solid rgba(255,255,255,0.04);
+      padding:10px 14px;
+      border-radius:10px;
+      cursor:pointer;
+      font-weight:600;
+      font-size:0.95rem;
+    }
+    .btn.ghost { background:transparent; border: 1px dashed rgba(255,255,255,0.04); }
+    .small { font-size:0.85rem; padding:8px 10px; }
+
+    .expired {
+      margin-top:18px;
+      font-weight:700;
+      color:#ffd7a8;
+    }
+
+    footer { margin-top:14px; font-size:0.8rem; opacity:0.75; }
+
+    /* responsivo */
+    @media (max-width:720px) {
+      .countdown { grid-template-columns: repeat(2,1fr); }
+      .target { text-align:left; width:100%; }
+      .meta { flex-direction:column; align-items:flex-start; gap:10px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="region" aria-label="Contagem regressiva para a praia">
+      <h1>Rumo à praia — Contagem regressiva</h1>
+      <p class="lead">Partiu areia, mar e água de coco. Mostrando tempo até <strong>29 de dezembro de 2025</strong>.</p>
+
+      <div id="countdown" class="countdown" aria-live="polite">
+        <div class="unit">
+          <div id="days" class="value">--</div>
+          <div class="label">Dias</div>
+        </div>
+        <div class="unit">
+          <div id="hours" class="value">--</div>
+          <div class="label">Horas</div>
+        </div>
+        <div class="unit">
+          <div id="minutes" class="value">--</div>
+          <div class="label">Minutos</div>
+        </div>
+        <div class="unit">
+          <div id="seconds" class="value">--</div>
+          <div class="label">Segundos</div>
+        </div>
+      </div>
+
+      <div class="meta">
+        <div class="progress-wrap" aria-hidden="true">
+          <progress id="progress" value="0" max="100"></progress>
+        </div>
+        <div class="target" id="targetText">Alvo: 2025-12-29</div>
+      </div>
+
+      <div class="controls" role="group" aria-label="Controles">
+        <button id="copyBtn" class="btn small">Copiar link da página</button>
+      </div>
+
+      <div id="expiredMsg" class="expired" style="display:none;">Você já chegou. Aproveite a praia — desligue o site e vá para o sol.</div>
+
+    </div>
+
+    <div style="max-width:760px; width:100%; color:#dbeafe; opacity:0.9; font-size:0.95rem; text-align:left;">
+      <details style="background:rgba(255,255,255,0.02); padding:12px; border-radius:10px;">
+        <summary style="cursor:pointer; font-weight:700;">Como funciona (claro que você quer saber)</summary>
+        <div style="margin-top:8px; line-height:1.45;">
+          <ul>
+            <li>O progresso mostra quantos por cento do tempo entre agora e a chegada já passou (0% = agora; 100% = chegada).</li>
+            <li>O botão "Copiar link da página" tenta copiar a URL atual (útil se você hospedar). Se estiver local, copia file://... dependendo do navegador.</li>
+          </ul>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <script>
+    // CONFIG ---------------------------------------------------------
+    // Define o alvo: 29 de dezembro de 2025 às 00:00 no fuso -03:00 (America/Sao_Paulo)
+    // Se quiser outro ano/hora, altere a string ISO abaixo.
+    const TARGET_ISO = '2025-12-29T20:00:00-03:00';    // Inicialização de elementos
+    const daysEl = document.getElementById('days');
+    const hoursEl = document.getElementById('hours');
+    const minutesEl = document.getElementById('minutes');
+    const secondsEl = document.getElementById('seconds');
+    const progressEl = document.getElementById('progress');
+    const targetText = document.getElementById('targetText');
+    const expiredMsg = document.getElementById('expiredMsg');
+    const copyBtn = document.getElementById('copyBtn');
+    const setTimeBtn = document.getElementById('setTimeBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    // Parse target as Date forcing offset -03:00 (para coincidir com America/Sao_Paulo)
+    let targetDate = new Date(TARGET_ISO);
+
+    // Guard rails: se parse falhar, defina próximo 29 de dezembro local
+    if (isNaN(targetDate)) {
+      const now = new Date();
+      const year = now.getFullYear();
+      targetDate = new Date(`${year}-12-29T00:00:00-03:00`);
+      if (isNaN(targetDate)) {
+        // fallback genérico
+        targetDate = new Date(Date.UTC(year, 11, 29, 3, 0, 0)); // 00:00 -03 -> UTC+3
+      }
+    }
+
+    function pad(n){ return String(n).padStart(2, '0'); }
+
+    // Calcula totalmente o tempo total entre "agora" e target para o progress
+    function getTotalMillis(now, target) {
+      return Math.max(1, target.getTime() - startNowForProgress.getTime());
+    }
+
+    // Guard for progress baseline (momento em que a página carregou)
+    const startNowForProgress = new Date();
+
+    targetText.textContent = `Alvo: ${targetDate.toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'})} (America/Sao_Paulo)`;
+
+    function update() {
+      const now = new Date();
+      let diff = targetDate.getTime() - now.getTime();
+
+      if (diff <= 0) {
+        // evento já chegou ou passou
+        daysEl.textContent = '00';
+        hoursEl.textContent = '00';
+        minutesEl.textContent = '00';
+        secondsEl.textContent = '00';
+        progressEl.value = 100;
+        expiredMsg.style.display = 'block';
+        return;
+      } else {
+        expiredMsg.style.display = 'none';
+      }
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      diff -= days * (1000 * 60 * 60 * 24);
+      const hours = Math.floor(diff / (1000 * 60 * 60));
+      diff -= hours * (1000 * 60 * 60);
+      const minutes = Math.floor(diff / (1000 * 60));
+      diff -= minutes * (1000 * 60);
+     const seconds = Math.floor(diff / 1000);
+
+      daysEl.textContent = pad(days);
+      hoursEl.textContent = pad(hours);
+      minutesEl.textContent = pad(minutes);
+      secondsEl.textContent = pad(seconds);
+
+      // Progress: quanto do caminho entre o carregamento da página e o alvo já passou
+      const totalMillis = getTotalMillis(startNowForProgress, targetDate);
+      const passed = Math.min(totalMillis, now.getTime() - startNowForProgress.getTime());
+      const percent = Math.max(0, Math.min(100, (passed / totalMillis) * 100));
+      progressEl.value = percent;
+    }
+
+    // Atualiza imediatamente e depois a cada 1s
+    update();
+    const intervalId = setInterval(update, 1000);
+
+    // Controles UI
+    copyBtn.addEventListener('click', async () => {
+      // tenta copiar a URL atual
+      const toCopy = location.href;
+      try {
+        await navigator.clipboard.writeText(toCopy);
+        copyBtn.textContent = 'Link copiado ✓';
+        setTimeout(()=> copyBtn.textContent = 'Copiar link da página', 1600);
+      } catch (e) {
+        // fallback
+        const fallback = document.createElement('textarea');
+        fallback.value = toCopy;
+        document.body.appendChild(fallback);
+        fallback.select();
+        try { document.execCommand('copy'); copyBtn.textContent = 'Link copiado ✓'; }
+        catch { copyBtn.textContent = 'Não foi possível copiar'; }
+        fallback.remove();
+        setTimeout(()=> copyBtn.textContent = 'Copiar link da página', 1600);
+      }
+    });
+
+    setTimeBtn.addEventListener('click', () => {
+      const newIso = prompt('Defina data/hora alvo no formato ISO (ex: 2025-12-29T15:00:00-03:00). Deixe em branco para cancelar.', TARGET_ISO);
+      if (!newIso) return;
+      const parsed = new Date(newIso);
+      if (isNaN(parsed)) {
+        alert('Formato inválido. Use algo como: 2025-12-29T15:00:00-03:00');
+        return;
+      }
+      targetDate = parsed;
+      // reset progress baseline para novo cálculo
+      startNowForProgress.setTime(Date.now());
+      targetText.textContent = `Alvo: ${targetDate.toLocaleString('pt-BR', {timeZone: 'America/Sao_Paulo'})} (America/Sao_Paulo)`;
+      update();
+    });
+
+    resetBtn.addEventListener('click', () => {
+      // redefine baseline de progress e atualiza imediatamente
+      startNowForProgress.setTime(Date.now());
+      update();
+      resetBtn.textContent = 'Reiniciado';
+      setTimeout(()=> resetBtn.textContent = 'Reiniciar (agora)', 1200);
+    });
+
+    // Segurança: limpa o interval quando a aba for descarregada
+    window.addEventListener('beforeunload', () => clearInterval(intervalId));
+  </script>
+</body>
+</html>
